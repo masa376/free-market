@@ -1,0 +1,4 @@
+# Docker MySQL data (do not track)
+docker/mysql/data/
+# Editor settings
+.vscode/
