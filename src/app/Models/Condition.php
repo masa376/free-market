@@ -12,8 +12,8 @@ class Condition extends Model
         'item_condition',
     ];
 
-    public function sells(): HasMany
+    public function items()
     {
-        return $this->hasMany(Sell::class, 'condition_id');
+        return $this->hasMany(Item::class);
     }
 }

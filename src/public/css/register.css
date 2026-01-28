@@ -1,0 +1,28 @@
+/* header */
+.header {
+    width: 1515px;
+    height: 82px;
+    background: #000000;
+}
+
+.header_inner {
+    height: 82px;
+    display: flex;
+    align-items: center;
+    padding-left: 25px;
+}
+
+/* content */
+.main {
+    padding-top: 178px;
+    display: flex;
+    justify-content: center;
+}
+
+.content {
+    width: 680px;
+    height: 678px;
+    text-align: center;
+}
+
+/*

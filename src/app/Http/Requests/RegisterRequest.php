@@ -9,9 +9,9 @@ class RegisterRequest extends FormRequest
     /**
      * Determine if the user is authorized to make this request.
      *
-     * @return bool
+     *
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -19,9 +19,9 @@ class RegisterRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array
+     *
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => ['required','max:20'],
@@ -31,15 +31,25 @@ class RegisterRequest extends FormRequest
         ];
     }
 
-    public function messages()
+    public function attributes(): array
     {
         return [
-            'name.required' => 'お名前を入力してください',
-            'email.required' => 'メールアドレスを入力してください',
-            'email.email' => 'メールアドレスはメール形式で入力してください',
-            'password.required' => 'パスワードを入力してください',
-            'password.min' => 'パスワードは8文字以上で入力してください',
-            'password_confirmation.same' => 'パスワードと一致しません',
+            'name' => 'ユーザー名',
+            'email' => 'メールアドレス',
+            'password' => 'パスワード',
+            'password_confirmation' => '確認用パスワード',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.required' => ':attributeを入力してください',
+            'email.required' => ':attributeを入力してください',
+            'email.email' => ':attributeはメール形式で入力してください',
+            'password.required' => ':attributeを入力してください',
+            'password.min' => ':attributeは8文字以上で入力してください',
+            'password_confirmation.same' => ':attributeと一致しません',
         ];
     }
 }

@@ -40,8 +40,35 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function profile():HasOne
+    public function profile()
     {
         return $this->hasOne(Profile::class);
     }
+
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
+
+    public function favoriteItems()
+    {
+        return $this->belongsToMany(Item::class, 'favorites')->withTimestamps();
+    }
+
+    //出品した商品
+    public function sellingItems()
+    {
+        return $this->hasMany(Item::class, 'seller_id');
+    }
+
+    //購入した商品
+    public function boughtItems()
+    {
+        return $this->hasMany(Item::class, 'buyer_id');
+    }
+}
+
+class User extends Authenticatable implements MustVerifyEmail
+{
+    //
 }

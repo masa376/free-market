@@ -13,6 +13,9 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 
+use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
+use App\Http\Requests\Fortify\LoginRequest as CustomLoginRequest;
+
 class FortifyServiceProvider extends ServiceProvider
 {
     /**
@@ -28,6 +31,8 @@ class FortifyServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->bind(FortifyLoginRequest::class, CustomLoginRequest::class);
+
         Fortify::createUsersUsing(CreateNewUser::class);
 
         Fortify::loginView(function () {

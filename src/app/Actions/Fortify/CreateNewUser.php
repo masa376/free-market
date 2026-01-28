@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -19,37 +20,19 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class),
-            ],
-            'password' => $this->passwordRules(),
+        $request = new RegisterRequest();
 
-            'postal_code' => ['required', 'regex:/^\d{3}-\d{4}$/'],
-            'address' => ['required'],
-            'building' => ['nullable'],
-        ])->validate();
+        Validator::make(
+            $input,
+            $request->rules(),
+            $request->messages(),
+            $request->attributes()
+        )->validate();
 
-        return DB::transaction(function () use ($input){
-
-            $user = User::create([
-                'name' => $input['name'],
-                'email' => $input['email'],
-                'password' => Hash::make($input['password']),
-            ]);
-
-            $user->profile()->create([
-                'postal_code' => $input['postal_code'],
-                'address' => $input['address'],
-                'building' => $input['building'] ?? null,
-                ]);
-
-                return $user;
-        });
+        return User::create([
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'password' => Hash::make($input['password']),
+        ]);
     }
 }

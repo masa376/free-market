@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddSoldAtToSellsTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddSoldAtToSellsTable extends Migration
      */
     public function up(): void
     {
-        Schema::table('sells', function (Blueprint $table) {
-            $table->timestamp('sold_at')->nullable()->after('price');
+        Schema::table('items', function (Blueprint $table) {
+            $table->boolean('is_sold')->default(false)->after('price');
         });
     }
 
@@ -25,8 +25,8 @@ class AddSoldAtToSellsTable extends Migration
      */
     public function down(): void
     {
-        Schema::table('sells', function (Blueprint $table) {
-            $table->dropColumn('sold_at');
+        Schema::table('items', function (Blueprint $table) {
+            $table->dropColumn('is_sold');
         });
     }
-}
+};

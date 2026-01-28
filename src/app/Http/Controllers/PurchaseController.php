@@ -4,44 +4,74 @@ namespace App\Http\Controllers;
 
 use App\Http\Request;
 use App\Models\Profile;
-use App\Models\Sell;
-
+use App\Models\Item;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
-    public function create()
+    public function create(Item $item)
     {
-        return view('purchase.create');
+        $user = Auth::user();
+
+        //プロフィール（住所）を取得
+        $profile = $user->profile;
+
+        //住所未登録ならプロフィール編集へ誘導（要件に合わせて変更）
+        if (!$profile || !$profile->postal_code || !$profile->address) {
+            return redirect()->route('mypage.profile.edit');
+        }
+
+        //画面表示用に ”住所文字列” を作って渡す（Bladeで組み立てるも良し）
+        $shippingAddress = [
+            'postal_code' => $profile->postal_code,
+            'address'     => $profile->address,
+            'building'    => $profile->building,
+        ];
+
+        return view('purchase.create', compact('item','shippingAddress'));
     }
 
-    public function store(PurchaseRequest $request)
+
+    public function store(Request $request, Item $item)
     {
-        Profile::create($request->only(['postal_code', 'address', 'building',]));
-        return redirect()->route('item.index');
-    }
+        $user = Auth::user();
 
-    //購入確認画面？
+        $request->validate([
+            'postal_code' => ['required'],
+            'address' => ['required'],
+            'building' => ['nullable'],
+        ]);
 
-    //購入確定
-    public function store(Request $request, Sell $sell)
-    {
-        DB::transaction(function () use ($sell) {
-            $locked = Sell::where('id', $sell->id)->lockForUpdate()->first();
+        //売り切れ・二重購入防止のため、DB処理をまとめて行う
+        DB::transaction(function () use ($request, $item, $user) {
 
-            if ($locked->sold_at) {
-                abort(409, '購入済');
+            // 最新状態をロックして読み直す（同時購入対策）
+            $lockedItem = Item::where('id', $item->id)->lockForUpdate()->first();
+
+            if ($lockedItem->is_sold) {
+            abort(409);
             }
 
-            if ($locked->user_id === auth()->id()) {
-                abort(403, '自分の商品は購入不可');
+            // 出品者が自分なら購入不可にするなら・・
+            if ($lockedItem->user_id === $user->id) {
+            abort(403);
             }
 
-            $locked->buyer_id = auth()->id();
-            $locked->sold_at = now();
-            $locked->save();
+            // 購入確定にする
+            Purchase::create([
+                'buyer_id'    => $user->id,
+                'item_id'     => $lockedItem->id,
+                'postal_code' => $request->postal_code,
+                'address'     => $request->address,
+                'building'    => $request->building,
+            ]);
+
+            //購入済(売り切れ)にする
+            $lockedItem->update(['is_sold' => true]);
         });
 
-        return redirect()->route('item.index', $sell);
-    }
+        return redirect()->route('items.index');
+}
+
 }

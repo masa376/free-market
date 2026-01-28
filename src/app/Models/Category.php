@@ -12,8 +12,8 @@ class Category extends Model
         'content',
     ];
 
-    public function sells(): HasMany
+    public function items()
     {
-        return $this->hasMany(Sell::class, 'category_id');
+        return $this->belongsToMany(Item::class)->withTimestamps();
     }
 }
