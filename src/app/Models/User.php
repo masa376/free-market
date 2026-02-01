@@ -67,8 +67,3 @@ class User extends Authenticatable
         return $this->hasMany(Item::class, 'buyer_id');
     }
 }
-
-class User extends Authenticatable implements MustVerifyEmail
-{
-    //
-}
