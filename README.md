@@ -8,6 +8,7 @@ Laravel環境構築
 ・cp .env.example .env 環境変数変更
 ・php artisan key:generate
 ・php artisan migrate
+・php artisan db:seed
 
 開発環境
 ・ユーザー登録：http://localhost:8096/register
